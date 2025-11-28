@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: 'Cutz & Fadez: Lab 1 - Network Layer'
+ 
+Resources:
+
+  CutzFZVPC:
+
+    Type: AWS::EC2::VPC
+
+    Properties:
+
+      CidrBlock: 10.0.0.0/16
+
+      EnableDnsHostnames: true
+
+      Tags: [{Key: Name, Value: CutzFZ-VPC}]
+ 
+  InternetGateway:
+
+    Type: AWS::EC2::InternetGateway
+ 
+  GatewayAttachment:
+
+    Type: AWS::EC2::VPCGatewayAttachment
+
+    Properties:
+
+      VpcId: !Ref CutzFZVPC
+
+      InternetGatewayId: !Ref InternetGateway
+ 
+  PublicSubnet:
+
+    Type: AWS::EC2::Subnet
+
+    Properties:
+
+      VpcId: !Ref CutzFZVPC
+
+      CidrBlock: 10.0.1.0/24
+
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+
+      MapPublicIpOnLaunch: true
+
+      Tags: [{Key: Name, Value: CutzFZ-Public-Subnet}]
+ 
+  PrivateSubnet:
+
+    Type: AWS::EC2::Subnet
+
+    Properties:
+
+      VpcId: !Ref CutzFZVPC
+
+      CidrBlock: 10.0.2.0/24
+
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+
+      MapPublicIpOnLaunch: false
+
+      Tags: [{Key: Name, Value: CutzFZ-Private-Subnet}]
+ 
+  PublicRouteTable:
+
+    Type: AWS::EC2::RouteTable
+
+    Properties: {VpcId: !Ref CutzFZVPC, Tags: [{Key: Name, Value: CutzFZ-RT-Public}]}
+ 
+  PublicRoute:
+
+    Type: AWS::EC2::Route
+
+    DependsOn: GatewayAttachment
+
+    Properties: {RouteTableId: !Ref PublicRouteTable, DestinationCidrBlock: 0.0.0.0/0, GatewayId: !Ref InternetGateway}
+ 
+  PublicSubnetRouteTableAssociation:
+
+    Type: AWS::EC2::SubnetRouteTableAssociation
+
+    Properties: {SubnetId: !Ref PublicSubnet, RouteTableId: !Ref PublicRouteTable}
+ 
+Outputs:
+
+  VPCId: {Value: !Ref CutzFZVPC, Export: {Name: CutzFZ-VPCID}}
+
+  PublicSubnetId: {Value: !Ref PublicSubnet, Export: {Name: CutzFZ-PublicSubnetID}}
+
+  PrivateSubnetId: {Value: !Ref PrivateSubnet, Export: {Name: CutzFZ-PrivateSubnetID}}
+ 

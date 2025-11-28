@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: 'Cutz & Fadez: Lab 2 - App Layer'
+ 
+Parameters:
+
+  KeyName:
+
+    Type: AWS::EC2::KeyPair::KeyName
+
+    Description: Select the CutzFZ-Key you created in AWS
+
+  YourIpAddress:
+
+    Type: String
+
+    Description: Your IP Address (We default to 0.0.0.0/0 for labs)
+
+    Default: 0.0.0.0/0
+ 
+Mappings:
+
+  RegionMap:
+
+    us-east-1: {AMI: ami-0c614dee691cbbf37}
+
+    us-east-2: {AMI: ami-0430580de6244e02e}
+
+    us-west-2: {AMI: ami-0735c191cf914754d}
+ 
+Resources:
+
+  BastionSG:
+
+    Type: AWS::EC2::SecurityGroup
+
+    Properties:
+
+      GroupDescription: SSH Access
+
+      VpcId: !ImportValue CutzFZ-VPCID
+
+      SecurityGroupIngress:
+
+        # ALLOWING ALL IPS FOR LAB ACCESS (Since you are on a VM)
+
+        - {IpProtocol: tcp, FromPort: 22, ToPort: 22, CidrIp: !Ref YourIpAddress}
+ 
+  PrivateSG:
+
+    Type: AWS::EC2::SecurityGroup
+
+    Properties:
+
+      GroupDescription: SSH from Bastion only
+
+      VpcId: !ImportValue CutzFZ-VPCID
+
+      SecurityGroupIngress:
+
+        - {IpProtocol: tcp, FromPort: 22, ToPort: 22, SourceSecurityGroupId: !Ref BastionSG}
+ 
+  BastionHost:
+
+    Type: AWS::EC2::Instance
+
+    Properties:
+
+      InstanceType: t2.micro
+
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+
+      KeyName: !Ref KeyName
+
+      SubnetId: !ImportValue CutzFZ-PublicSubnetID
+
+      SecurityGroupIds: [!Ref BastionSG]
+
+      Tags: [{Key: Name, Value: CutzFZ-Bastion}]
+ 
+  BackendServer:
+
+    Type: AWS::EC2::Instance
+
+    Properties:
+
+      InstanceType: t2.micro
+
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+
+      KeyName: !Ref KeyName
+
+      SubnetId: !ImportValue CutzFZ-PrivateSubnetID
+
+      SecurityGroupIds: [!Ref PrivateSG]
+
+      Tags: [{Key: Name, Value: CutzFZ-Private-App}]
+ 
+Outputs:
+
+  BastionIP: {Value: !GetAtt BastionHost.PublicIp}
+
+  BackendPrivateIP: {Value: !GetAtt BackendServer.PrivateIp}
+ 
