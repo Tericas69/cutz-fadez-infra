@@ -55,3 +55,4 @@ Resources:
 Outputs:
   SiteUrl: {Value: !Sub "https://${Distribution.DomainName}"}
   BucketName: {Value: !Ref FrontendBucket}
+  # Force update
