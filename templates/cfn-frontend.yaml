@@ -6,7 +6,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       # Customized for tericas69 to ensure uniqueness
-      BucketName: !Sub "cutz-fadez-web-tericas69-${AWS::StackName}-${AWS::AccountId}"
+      BucketName: !Sub "cutz-fadez-web-tericas69-${AWS::Region}-${AWS::AccountId}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
