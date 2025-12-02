@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cutz & Fadez: Observability Layer (GuardDuty & SNS) - Compliant with Sec 4.5 & 7.5'
+ 
+Resources:
+  # 1. GuardDuty Detector (The Threat Radar)
+  # Compliance: Section 4.5 Security Visibility & 7.5 Threat Automation
+  GuardDutyDetector:
+    Type: AWS::GuardDuty::Detector
+    Properties:
+      Enable: true
+      FindingPublishingFrequency: FIFTEEN_MINUTES
+ 
+  # 2. SNS Topic (The Alarm System)
+  # Compliance: Section 7.9.3 Internal Communication
+  SecurityAlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "CutzFadez-Security-Alerts-${AWS::StackName}"
+      DisplayName: "Cutz & Fadez Security Operations"
+ 
+Outputs:
+  GuardDutyId:
+    Value: !Ref GuardDutyDetector
+    Description: "The ID of the GuardDuty Detector"
+  SnsTopicArn:
+    Value: !Ref SecurityAlertsTopic
+    Description: "The ARN of the Security Alerts SNS Topic"
