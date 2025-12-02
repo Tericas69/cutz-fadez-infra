@@ -1,7 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Cutz & Fadez: Lab 3 - Backend Layer'
+Description: 'Cutz & Fadez: Lab 3 - Backend Layer (API Gateway + DynamoDB)'
  
 Resources:
+  # 1. DynamoDB Table (Compliant with Section 8.3 - Data Durability)
   ProductTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -13,19 +14,25 @@ Resources:
       KeySchema:
         - {AttributeName: category, KeyType: HASH}
         - {AttributeName: sku, KeyType: RANGE}
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true # Compliance: Section 8.3 Data Protection
  
+  # 2. IAM Role (Compliant with Section 3.2 - Least Privilege)
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement: [{Effect: Allow, Principal: {Service: lambda.amazonaws.com}, Action: sts:AssumeRole}]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: DBRead
+        - PolicyName: DynamoDBRead
           PolicyDocument:
             Version: '2012-10-17'
-            Statement: [{Effect: Allow, Action: [dynamodb:Scan], Resource: !GetAtt ProductTable.Arn}]
+            Statement: [{Effect: Allow, Action: [dynamodb:Scan, dynamodb:GetItem], Resource: !GetAtt ProductTable.Arn}]
  
+  # 3. Lambda Function
   GetProductsFunc:
     Type: AWS::Lambda::Function
     Properties:
@@ -41,23 +48,61 @@ Resources:
           exports.handler = async (event) => {
             const command = new ScanCommand({ TableName: process.env.TABLE_NAME });
             const data = await client.send(command);
-            return { statusCode: 200, body: JSON.stringify(data.Items) };
+            return {
+              statusCode: 200,
+              headers: { "Access-Control-Allow-Origin": "*" },
+              body: JSON.stringify(data.Items)
+            };
           };
  
-  LambdaUrl:
-    Type: AWS::Lambda::Url
+  # 4. API Gateway (Compliant with Section 6.4)
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
     Properties:
-      TargetFunctionArn: !Ref GetProductsFunc
-      AuthType: NONE
-      Cors: {AllowOrigins: ["*"], AllowMethods: ["GET"]}
+      Name: CutzFadez-API
+      Description: API Gateway for Zero Trust Architecture
  
-  LambdaPerm:
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: products
+ 
+  ApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiResource
+      HttpMethod: GET
+      AuthorizationType: NONE # Will upgrade to COGNITO later per Section 3.6
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetProductsFunc.Arn}/invocations
+ 
+  # Permission for API Gateway to invoke Lambda
+  LambdaApiPermission:
     Type: AWS::Lambda::Permission
     Properties:
+      Action: lambda:InvokeFunction
       FunctionName: !Ref GetProductsFunc
-      Principal: "*"
-      Action: lambda:InvokeFunctionUrl
-      FunctionUrlAuthType: NONE
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/GET/products
+ 
+  # Deploy the API
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiMethod
+    Properties:
+      RestApiId: !Ref ApiGateway
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref ApiDeployment
+      RestApiId: !Ref ApiGateway
+      StageName: prod
  
 Outputs:
-  ApiUrl: {Value: !GetAtt LambdaUrl.FunctionUrl}
+  ApiUrl:
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/products"
