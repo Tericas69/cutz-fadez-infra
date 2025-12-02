@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cutz & Fadez Apparel</title>
+<link rel="stylesheet" href="assets/css/style.css">
+ 
+    <style>
+        /* Slideshow container */
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 550px;
+            overflow: hidden;
+            background-color: black;
+        }
+ 
+        /* Each slide */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+ 
+            /* SHOW ENTIRE IMAGE */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #000;
+        }
+ 
+        /* Active slide */
+        .active {
+            opacity: 1;
+        }
+ 
+        /* Hero text overlay */
+        .hero-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            text-shadow: 2px 2px 12px rgba(0,0,0,0.8);
+            text-align: center;
+            width: 90%;
+        }
+ 
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .slideshow-container {
+                height: 350px;
+            }
+            .hero-text {
+                font-size: 22px;
+            }
+        }
+</style>
+</head>
+ 
+<body>
+ 
+    <!-- NAVBAR -->
+<div class="navbar">
+<div class="navbar-logo">
+<a href="index.html" style="font-size: 22px; font-weight: bold;">CUTZ & FADEZ</a>
+</div>
+<div class="navbar-menu">
+<a href="index.html" style="text-decoration: underline;">Home</a>
+<a href="mens.html">Mens</a>
+<a href="womens.html">Womens</a>
+<a href="accessories.html">Accessories</a>
+<a href="custom.html">Custom Shop</a>
+<a href="coaching.html">GXF Coaching</a>
+<a href="blog.html">Blog</a>
+</div>
+</div>
+ 
+    <!-- HERO SLIDESHOW -->
+<div class="slideshow-container">
+<div class="slide active" style="background-image: url('assets/img/home/slide1.jpg');"></div>
+<div class="slide" style="background-image: url('assets/img/home/slide2.jpg');"></div>
+<div class="slide" style="background-image: url('assets/img/home/slide3.jpg');"></div>
+<div class="slide" style="background-image: url('assets/img/home/slide4.jpg');"></div>
+<div class="slide" style="background-image: url('assets/img/home/slide5.jpg');"></div>
+<div class="slide" style="background-image: url('assets/img/home/slide6.jpg');"></div>
+<div class="slide" style="background-image: url('assets/img/home/slide7.jpg');"></div>
+<div class="slide" style="background-image: url('assets/img/home/slide8.jpg');"></div>
+ 
+        <div class="hero-text">
+            Elevate Your Game • Look Good • Play Confident
+</div>
+</div>
+ 
+    <!-- FOOTER -->
+<!-- SOCIAL + CONTACT FOOTER -->
+<div class="contact-footer" style="
+    text-align: center;
+    padding: 30px 20px;
+    background-color: #f5f5f5;
+    color: #014421;
+    font-size: 18px;
+">
+ 
+    <p style="margin: 8px 0; font-weight: bold; font-size: 20px;">
+        Connect With Us
+</p>
+ 
+    <p style="margin: 6px 0;">
+<a href="https://www.instagram.com/cutzandfadez/?hl=bn" 
+           target="_blank" 
+           style="color: #014421; text-decoration: none; font-weight: bold;">
+            Instagram: @CutzAndFadez
+</a>
+</p>
+ 
+    <p style="margin: 6px 0;">
+<a href="https://www.facebook.com/CutzAndFadezApparel"
+           target="_blank"
+           style="color: #014421; text-decoration: none; font-weight: bold;">
+            Facebook: Cutz & Fadez Apparel
+</a>
+</p>
+<p style="margin: 6px 0;">
+<a href="cutzandfadazapparel@gmail.com" 
+           target="_blank" 
+           style="color: #014421; text-decoration: none; font-weight: bold;">
+            Email us: @CutzAndFadez
+</a>
+
+    <p style="margin: 10px 0; font-size: 17px;">
+        Cutz & Fadez Apparel  
+<br>P.O. Box 2321  
+<br>Wylie, Texas 75098
+</p>
+</div>
+ 
+<!-- COPYRIGHT FOOTER -->
+<div class="footer" style="background-color: #014421; color: white;">
+        © 2025 Cutz & Fadez Apparel • Golf Lifestyle Clothing •For the Love of the Game
+</div>
+
+ 
+    <!-- SLIDESHOW SCRIPT -->
+<script>
+        let slideIndex = 0;
+        const slides = document.querySelectorAll(".slide");
+ 
+        function showSlides() {
+            slides.forEach(slide => slide.classList.remove("active"));
+            slideIndex = (slideIndex + 1) % slides.length;
+            slides[slideIndex].classList.add("active");
+        }
+ 
+        setInterval(showSlides, 4000);
+</script>
+ 
+</body>
+</html>
+
+ 
+ 

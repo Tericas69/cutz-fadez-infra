@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cutz & Fadez: Identity Layer (Cognito User Pool) - Compliant with Sec 3.6'
+ 
+Resources:
+  # 1. The User Pool (Where customer identities live)
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "CutzFadez-Users-${AWS::StackName}"
+      AutoVerifiedAttributes:
+        - email
+      # Compliance: Enforcing strong password policies (Sec 3.6)
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+ 
+  # 2. The App Client (Allows the frontend to connect securely)
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: CutzFadez-WebClient
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false # False is required for web apps (Javascript)
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+ 
+Outputs:
+  UserPoolId:
+    Value: !Ref UserPool
+    Description: "The ID of the User Pool"
+  UserPoolClientId:
+    Value: !Ref UserPoolClient
+    Description: "The ID of the App Client"
