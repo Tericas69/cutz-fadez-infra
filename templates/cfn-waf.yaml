@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cutz & Fadez: Security Layer (WAF) - Compliant with Sec 6.2'
+ 
+Resources:
+  # 1. The Web ACL (The Firewall Logic)
+  ApiWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub "CutzFadez-WAF-${AWS::StackName}"
+      Scope: REGIONAL # Protects API Gateway in Ohio
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: CutzFadezWafMetrics
+      Rules:
+        # Rule 1: Block SQL Injection (OWASP Top 10)
+        - Name: AWS-AWSManagedRulesSQLiRuleSet
+          Priority: 0
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesSQLiRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: SQLiRule
+ 
+        # Rule 2: Block Core Attacks (XSS, RFI, etc.)
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: CommonRule
+ 
+  # 2. The Association (Connecting WAF to your API)
+  # Note: We need the API Gateway ARN to connect this. 
+  # For this lab, we create the WAF first, then we would typically output the ID.
+ 
+Outputs:
+  WafAclArn:
+    Value: !GetAtt ApiWebACL.Arn
+    Description: "The ARN of the Web ACL"
