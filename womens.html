@@ -2,10 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Cutz & Fadez Golf</title>
+<title>Cutz & Fadez Golf - Womens Collection</title>
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
-    /* Page Specific Styles */
+    /* Page Header */
     .page-header {
         background-color: black;
         color: white;
@@ -15,18 +15,52 @@
     .page-header h1 {
         margin: 0;
         font-size: 40px;
-        color: #f39c12; /* Gold color */
+        color: #f39c12;
     }
+    /* Product Grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+    .product-card {
+        text-align: center;
+        padding: 20px;
+        border: 1px solid #eaeaea;
+        border-radius: 10px;
+        transition: 0.3s;
+        background: white;
+    }
+    .product-card:hover {
+        transform: scale(1.03);
+        border-color: #f39c12;
+    }
+    .product-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+    .product-name {
+        font-size: 20px;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+    .product-price {
+        color: #014421;
+        font-size: 18px;
+        margin-top: 5px;
+    }
+    /* Content wrapper */
     .content-container {
         padding: 50px 20px;
         max-width: 1000px;
         margin: 0 auto;
-        min-height: 400px; /* Keeps footer at bottom even if empty */
+        min-height: 400px;
     }
 </style>
 </head>
 <body>
- 
 <div class="navbar">
 <div class="navbar-logo">
 <a href="index.html">CUTZ & FADEZ</a>
@@ -42,15 +76,23 @@
 <a href="blog.html">Blog</a>
 </div>
 </div>
- 
 <div class="page-header">
 <h1>Womens Collection</h1>
- 
-<div class="content-container">
-<h2>Coming Soon</h2>
-<p>This collection is currently being curated. Check back shortly!</p>
 </div>
- 
+<div class="content-container">
+<div class="product-grid">
+<div class="product-card">
+<img src="assets/img/womens1.png" alt="Floral Golf Top">
+<p class="product-name">Tropical Floral Sleeveless Golf Top</p>
+<p class="product-price">$49.99</p>
+</div>
+<div class="product-card">
+<img src="assets/img/womens2.png" alt="White Floral Golf Top">
+<p class="product-name">Palm Garden Sleeveless Golf Top</p>
+<p class="product-price">$49.99</p>
+</div>
+</div>
+</div>
 <div class="contact-footer">
 <p class="contact-header">Connect With Us</p>
 <p><a href="https://www.instagram.com/cutzandfadez/" target="_blank" style="color: #014421; text-decoration: none; font-weight: bold;">Instagram: @CutzAndFadez</a></p>
@@ -59,6 +101,5 @@
 <p style="margin-top: 12px; font-size: 15px;">Cutz & Fadez Apparel<br>P.O. Box 2321<br>Wylie, Texas 75098</p>
 </div>
 <div class="footer">© 2025 Cutz & Fadez Apparel • Golf Lifestyle Clothing</div>
- 
 </body>
 </html>

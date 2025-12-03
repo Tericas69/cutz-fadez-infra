@@ -25,3 +25,69 @@ Outputs:
   SnsTopicArn:
     Value: !Ref SecurityAlertsTopic
     Description: "The ARN of the Security Alerts SNS Topic"
+    # 3. EventBridge Rule (The Automation Wire)
+
+  # Compliance: Section 8.7 Automated Recovery & 7.5 GuardDuty Automation
+
+  GuardDutyEventRule:
+
+    Type: AWS::Events::Rule
+
+    Properties:
+
+      Name: !Sub "CutzFadez-GuardDuty-Rule-${AWS::StackName}"
+
+      Description: "Trigger SNS when GuardDuty finds a High Severity threat"
+
+      EventPattern:
+
+        source:
+
+          - "aws.guardduty"
+
+        detail-type:
+
+          - "GuardDuty Finding"
+
+        detail:
+
+          severity: [ 7, 8, 8.0, 8.9 ] # Only alert on High Severity threats
+
+      State: "ENABLED"
+
+      Targets:
+
+        - Arn: !Ref SecurityAlertsTopic
+
+          Id: "GuardDutySNS"
+ 
+  # 4. SNS Permission (Allow EventBridge to ring the alarm)
+
+  SnsTopicPolicy:
+
+    Type: AWS::SNS::TopicPolicy
+
+    Properties:
+
+      Topics:
+
+        - !Ref SecurityAlertsTopic
+
+      PolicyDocument:
+
+        Version: '2012-10-17'
+
+        Statement:
+
+          - Sid: AllowEventBridgeToPublish
+
+            Effect: Allow
+
+            Principal:
+
+              Service: "events.amazonaws.com"
+
+            Action: "sns:Publish"
+
+            Resource: !Ref SecurityAlertsTopic
+ 
